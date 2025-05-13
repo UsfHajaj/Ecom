@@ -1,4 +1,5 @@
-﻿using Ecom.Core.Interfaces;
+﻿using AutoMapper;
+using Ecom.Core.Interfaces;
 using Ecom.infrastructure.Data;
 using Ecom.infrastructure.Repositries;
 using Microsoft.EntityFrameworkCore;
@@ -19,6 +20,7 @@ namespace Ecom.infrastructure
             services.AddScoped(typeof(IGenericRepositry<>), typeof(GenericRepositry<>));
             //Apply UnitOfWork
             services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
             services.AddDbContext<AppDbContext>(op => 
             {

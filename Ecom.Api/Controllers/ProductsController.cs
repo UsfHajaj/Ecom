@@ -1,0 +1,102 @@
+﻿using AutoMapper;
+using Ecom.Api.Helper;
+using Ecom.Core.DTOs;
+using Ecom.Core.Entites.Products;
+using Ecom.Core.Interfaces;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
+
+namespace Ecom.Api.Controllers
+{
+    [Route("api/[controller]")]
+    [ApiController]
+    public class ProductsController : BaseController
+    {
+        public ProductsController(IUnitOfWork work, IMapper mapper) : base(work, mapper)
+        {
+        }
+        [HttpGet("get-all")]
+        public async Task<IActionResult> GetAll()
+        {
+            try
+            {
+                var products = await work.ProductRepositry
+                    .GetAllAsync(x=>x.Category,x=>x.Photos);
+
+                var result=mapper.Map<IEnumerable<ProductDTO>>(products);
+                if (products == null) return BadRequest(new ResponseAPI(400, "Not Found Items"));
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpGet("get-by-id/{id}")]
+        public async Task<IActionResult> GetById(int id)
+        {
+            try
+            {
+                var product = await work.ProductRepositry
+                    .GetByIdAsync(id,x => x.Category, x => x.Photos);
+                var result=mapper.Map<ProductDTO>(product);
+                if (product == null) return BadRequest(new ResponseAPI(400, "Item Not Found"));
+                return Ok(result);
+            }
+            catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpPost]
+        public async Task<IActionResult> PostProduct(CreateProductDTO ProductDto)
+        {
+            try
+            {
+                if (!ModelState.IsValid) return BadRequest(new ResponseAPI(400));
+                var product = mapper.Map<Product>(ProductDto);
+                await work.ProductRepositry.AddAsync(product);
+                return Ok(new ResponseAPI(200, "Item Has Been Created"));
+            }
+            catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpPut("update-product")]
+        public async Task<IActionResult> PutProduct(UpdateProductDTO productDto)
+        {
+            try
+            {
+                var product = await work.ProductRepositry.GetByIdAsync(productDto.Id);
+                if (product == null) return BadRequest(new ResponseAPI(400, "Item Not Found"));
+                mapper.Map(productDto, product);
+                await work.ProductRepositry.UpdateAsync(product);
+                return Ok(new ResponseAPI(200, "Item Has Been Updated"));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+
+        [HttpDelete]
+        public async Task<IActionResult> DeleteProduct(int id)
+        {
+            try
+            {
+                var product = await work.ProductRepositry.GetByIdAsync(id);
+                if (product == null) return BadRequest(new ResponseAPI(400, "Item Not Found"));
+                await work.ProductRepositry.DeleteAsync(id);
+                return Ok(new ResponseAPI(200, "Item Has Been Deleted"));
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+    }
+}
