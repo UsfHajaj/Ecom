@@ -16,7 +16,8 @@ namespace Ecom.Api.Helper
                 200 => "Done",
                 400=> "Bad Request",
                 401=>"Un Authorized",
-                500=>"Server Error",
+                404 => "Not Found",
+                500 =>"Server Error",
                 _=>null!,
             };
         }

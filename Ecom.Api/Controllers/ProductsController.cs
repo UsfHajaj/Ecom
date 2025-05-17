@@ -49,19 +49,19 @@ namespace Ecom.Api.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        [HttpPost]
+        [HttpPost("add-product")]
         public async Task<IActionResult> PostProduct(CreateProductDTO ProductDto)
         {
             try
             {
                 if (!ModelState.IsValid) return BadRequest(new ResponseAPI(400));
-                var product = mapper.Map<Product>(ProductDto);
-                await work.ProductRepositry.AddAsync(product);
+                //var product = mapper.Map<Product>(ProductDto);
+                await work.ProductRepositry.AddAsync(ProductDto); 
                 return Ok(new ResponseAPI(200, "Item Has Been Created"));
             }
             catch(Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new ResponseAPI(400,ex.Message));
             }
         }
         [HttpPut("update-product")]
@@ -71,8 +71,7 @@ namespace Ecom.Api.Controllers
             {
                 var product = await work.ProductRepositry.GetByIdAsync(productDto.Id);
                 if (product == null) return BadRequest(new ResponseAPI(400, "Item Not Found"));
-                mapper.Map(productDto, product);
-                await work.ProductRepositry.UpdateAsync(product);
+                await work.ProductRepositry.UpdateAsync(productDto);
                 return Ok(new ResponseAPI(200, "Item Has Been Updated"));
             }
             catch (Exception ex)
@@ -82,14 +81,14 @@ namespace Ecom.Api.Controllers
         }
 
 
-        [HttpDelete]
+        [HttpDelete("delete-product/{id}")]
         public async Task<IActionResult> DeleteProduct(int id)
         {
             try
             {
                 var product = await work.ProductRepositry.GetByIdAsync(id);
                 if (product == null) return BadRequest(new ResponseAPI(400, "Item Not Found"));
-                await work.ProductRepositry.DeleteAsync(id);
+                await work.ProductRepositry.DeleteAsync(product);
                 return Ok(new ResponseAPI(200, "Item Has Been Deleted"));
 
             }

@@ -1,4 +1,5 @@
 ﻿using Ecom.Core.Entites.Products;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -23,7 +24,16 @@ namespace Ecom.Core.DTOs
         public int ProductId { get; set; }
     }
     public record CreateProductDTO
-    (string Name, string Description, decimal Price, int CategoryId);
-    public record UpdateProductDTO
-    (string Name, string Description, decimal Price, int CategoryId,int Id);
+    {
+        public string Name { get; set; }
+        public string Description { get; set; }
+        public decimal NewPrice { get; set; }
+        public decimal OldPrice { get; set; }
+        public int CategoryId { get; set; }
+        public IFormFileCollection Photo { get; set; }
+    }
+    public record UpdateProductDTO : CreateProductDTO
+    {
+        public int Id { get; set; }
+    }
 }

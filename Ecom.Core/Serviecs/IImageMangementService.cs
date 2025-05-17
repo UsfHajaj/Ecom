@@ -10,6 +10,6 @@ namespace Ecom.Core.Serviecs
     public interface IImageMangementService
     {
         Task<List<string>> AddImageAsync(IFormFileCollection files,string src);
-        Task DeleteImageAsync(string src);
+        void DeleteImageAsync(string src);
     }
 }
