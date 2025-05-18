@@ -10,8 +10,22 @@ namespace Ecom.Api
         {
             var builder = WebApplication.CreateBuilder(args);
 
+
             // Add services to the container.
             builder.Services.infrastructureConfiguration(builder.Configuration);
+
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("CORSPolicy",
+                    builder =>
+                    {
+                        builder.WithOrigins("https://localhost:4200")
+                               .AllowCredentials()
+                               .AllowAnyMethod()
+                               .AllowAnyHeader();
+                    });
+            });
+            builder.Services.AddMemoryCache();
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
@@ -25,6 +39,7 @@ namespace Ecom.Api
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
+            app.UseCors("CORSPolicy");
             app.UseMiddleware<ExceptionsMiddleware>(); 
             app.UseStatusCodePagesWithReExecute("/errors/{0}");   
             app.UseHttpsRedirection();

@@ -3,6 +3,7 @@ using Ecom.Core.DTOs;
 using Ecom.Core.Entites.Products;
 using Ecom.Core.Interfaces;
 using Ecom.Core.Serviecs;
+using Ecom.Core.Sharing;
 using Ecom.infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -25,7 +26,51 @@ namespace Ecom.infrastructure.Repositries
             _mapper = mapper;
             _imageMangementService = imageMangementService;
         }
+        public async Task<IEnumerable<ProductDTO>> GetAllAsync(ProductParams productParams)
+        {
+            var query = _context.Products
+                .Include(m => m.Category)
+                .Include(m => m.Photos)
+                .AsNoTracking();
 
+
+
+            if(!string.IsNullOrEmpty(productParams.Search))
+            {
+
+                var SearchWord = productParams.Search.Split(" ");
+                query = query.Where(m => SearchWord.All(word=>
+                
+                m.Name.ToLower().Contains(word.ToLower()) 
+                || m.Description.ToLower().Contains(word.ToLower())
+                ));
+            }
+
+
+            if (productParams.CategoryId.HasValue)
+            {
+                query = query.Where(m => m.CategoryId == productParams.CategoryId);
+            }
+
+            if (!string.IsNullOrEmpty(productParams.Sort))
+            {
+                query = productParams.Sort switch
+                {
+                    "PriceAcn" => query.OrderBy(m => m.NewPrice),
+                    "PriceDce" => query.OrderByDescending(m => m.NewPrice),
+                    _ => query.OrderBy(m => m.Name),
+                };
+            }
+            else
+            {
+                query = query.OrderBy(m => m.Name);
+            }
+            
+            query = query.Skip((productParams.PageNumber - 1) * productParams.PageSize)
+                .Take(productParams.PageSize); 
+            var result = _mapper.Map<List<ProductDTO>>(query);
+            return result;
+        }
         public async Task<bool> AddAsync(CreateProductDTO productDTO)
         {
             if (productDTO == null) return false;
