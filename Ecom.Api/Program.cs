@@ -19,7 +19,7 @@ namespace Ecom.Api
                 options.AddPolicy("CORSPolicy",
                     builder =>
                     {
-                        builder.WithOrigins("https://localhost:4200")
+                        builder.WithOrigins("http://localhost:4200")
                                .AllowCredentials()
                                .AllowAnyMethod()
                                .AllowAnyHeader();
@@ -40,11 +40,15 @@ namespace Ecom.Api
                 app.UseSwaggerUI();
             }
             app.UseCors("CORSPolicy");
-            app.UseMiddleware<ExceptionsMiddleware>(); 
+            app.UseMiddleware<ExceptionsMiddleware>();
+
+            app.UseAuthentication();
+            app.UseAuthorization();
+
             app.UseStatusCodePagesWithReExecute("/errors/{0}");   
             app.UseHttpsRedirection();
-
-            app.UseAuthorization();
+            
+            
 
             app.UseStaticFiles();
             app.MapControllers();

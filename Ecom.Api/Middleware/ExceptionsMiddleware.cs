@@ -64,7 +64,7 @@ namespace Ecom.Api.Middleware
 
             if (dateNow - timesTemp<_RateLimitWindow)
             {
-                if (count >= 8)
+                if (count >= 30)
                 {
                     return false;
                 }

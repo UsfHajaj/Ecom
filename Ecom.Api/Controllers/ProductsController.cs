@@ -18,15 +18,15 @@ namespace Ecom.Api.Controllers
         {
         }
         [HttpGet("get-all")]
-        public async Task<IActionResult> get([FromQuery] ProductParams productParams)
+        public async Task<IActionResult> get([FromQuery] ProductParams? productParams)
         {
             try
             {
                 var product = await work.ProductRepositry
                     .GetAllAsync(productParams);
 
-                var totalCount = await work.ProductRepositry.CountAsync();
-                return Ok(new Pagination<ProductDTO>(productParams.PageNumber,productParams.PageSize, totalCount, product));
+                //var totalCount = await work.ProductRepositry.CountAsync();
+                return Ok(new Pagination<ProductDTO>(productParams.PageNumber,productParams.PageSize, product.TotalCount, product.Products));
             }
             catch (Exception ex)
             {
