@@ -18,6 +18,7 @@ using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -35,6 +36,7 @@ namespace Ecom.infrastructure
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<IGenerateToken, GenerateToken>();
+            services.AddScoped<IOrderService,OrderService>();
             services.AddSingleton<IConnectionMultiplexer>(i =>
             {
                 var config = ConfigurationOptions.Parse(configuration.GetConnectionString("redis"));

@@ -60,7 +60,7 @@ IGenerateToken token)
 
             CustomerBasketRepositry = new CustomerBasketRepositry(redis);
 
-            Auth = new AuthRepositry(userManager, emailService, signInManager,token);
+            Auth = new AuthRepositry(userManager, emailService, signInManager,token,context);
             
         }
     }

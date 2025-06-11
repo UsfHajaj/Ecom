@@ -26,6 +26,7 @@ namespace Ecom.infrastructure.Repositries.Services
             List<Claim> claims = new List<Claim>()
             {
                 //new Claim(ClaimTypes.NameIdentifier,appUser.Id),
+
                 new Claim(ClaimTypes.Name,appUser.UserName),
                 new Claim(ClaimTypes.Email,appUser.Email),
                 

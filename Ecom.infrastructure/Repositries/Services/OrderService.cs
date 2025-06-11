@@ -4,6 +4,7 @@ using Ecom.Core.Entites.Order;
 using Ecom.Core.Interfaces;
 using Ecom.Core.Serviecs;
 using Ecom.infrastructure.Data;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -50,22 +51,34 @@ namespace Ecom.infrastructure.Repositries.Services
 
             await _context.Orders.AddAsync(order);
             await _context.SaveChangesAsync();
+            await _work.CustomerBasketRepositry.DeleteBasketAsync(orderDTO.basketId);
             return order;
         }
 
-        public Task<IReadOnlyList<Orders>> GetAllOrdersForUserAsync(string BuyerEmail)
+        public async Task<IReadOnlyList<OrderToReturnDTO>> GetAllOrdersForUserAsync(string BuyerEmail)
         {
-            throw new NotImplementedException();
+            var orders = await _context.Orders.Where(m => m.BuyerEmail == BuyerEmail)
+                .Include(inc => inc.orderItems).Include(inc => inc.deliveryMethod)
+                .ToListAsync();
+            var result = _mapper.Map<IReadOnlyList<OrderToReturnDTO>>(orders);
+            
+            return result;
         }
 
-        public Task<IReadOnlyList<DeliveryMethod>> GetDeliveryMethodAsync()
+        public async Task<IReadOnlyList<DeliveryMethod>> GetDeliveryMethodAsync()
         {
-            throw new NotImplementedException();
+            return await _context.DeliveryMethods.AsNoTracking().ToListAsync();
         }
 
-        public Task<Orders> GetOrderByIdAsync(int Id, string BuyerEmail)
+        public async Task<OrderToReturnDTO> GetOrderByIdAsync(int Id, string BuyerEmail)
         {
-            throw new NotImplementedException();
+            var order = await _context.Orders
+                .Where(m => m.Id == Id && m.BuyerEmail == BuyerEmail)
+                .Include(m=>m.orderItems)
+                .Include(m=>m.deliveryMethod)
+                .FirstOrDefaultAsync();
+            var result = _mapper.Map<OrderToReturnDTO>(order);
+            return result;
         }
     }
 }

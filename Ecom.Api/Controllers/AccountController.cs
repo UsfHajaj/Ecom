@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
 using Ecom.Api.Helper;
 using Ecom.Core.DTOs;
+using Ecom.Core.Entites;
 using Ecom.Core.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -38,14 +40,14 @@ namespace Ecom.Api.Controllers
 
             Response.Cookies.Append("token", result,new CookieOptions
             {
-                Secure=true,
-                HttpOnly=true,
-                Domain="localhost",
-                Expires=DateTime.Now.AddDays(1),
-                IsEssential=true,
-                SameSite=SameSiteMode.Strict
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.None,
+                IsEssential = true,
+                Domain = "localhost",
+                Expires = DateTime.Now.AddDays(1)
             });
-            return Ok(new ResponseAPI(200));
+            return Ok(new ResponseAPI(200,result));
         }
         [HttpPost("active-account")]
         public async Task<IActionResult> ActiveAccount(ActiveAccountDTO activeAccountDTO)
@@ -78,6 +80,27 @@ namespace Ecom.Api.Controllers
                 return Ok(new ResponseAPI(200));
             }
             return BadRequest(new ResponseAPI(400));
+        }
+
+        [Authorize]
+        [HttpPut("update-address")]
+        public async Task<IActionResult> updateAddress(ShipAddressDTO addressDTO)
+        {
+            var email = User.FindFirst(ClaimTypes.Email)?.Value;
+            var address = mapper.Map<Address>(addressDTO);
+            var result = await work.Auth.UpdateAddress(email, address);
+            return result ? Ok(new ResponseAPI(200)) : BadRequest();
+        }
+
+        [Authorize]
+        [HttpGet("get-address-for-user")]
+        public async Task<IActionResult> GetUserAddress()
+        {
+            var email = User.FindFirstValue(ClaimTypes.Email);
+            var address=await work.Auth.GetAddress(email);
+            var result=mapper.Map<ShipAddressDTO>(address);
+
+            return Ok(result);
         }
     }
 }

@@ -20,9 +20,9 @@ namespace Ecom.Api
                     builder =>
                     {
                         builder.WithOrigins("http://localhost:4200")
-                               .AllowCredentials()
                                .AllowAnyMethod()
-                               .AllowAnyHeader();
+                               .AllowAnyHeader()
+                               .AllowCredentials();
                     });
             });
             builder.Services.AddMemoryCache();
@@ -39,10 +39,11 @@ namespace Ecom.Api
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
+            app.UseRouting();
             app.UseCors("CORSPolicy");
             app.UseMiddleware<ExceptionsMiddleware>();
 
-            app.UseAuthentication();
+            app.UseAuthentication(); // ãåã ÌÏÇð
             app.UseAuthorization();
 
             app.UseStatusCodePagesWithReExecute("/errors/{0}");   
