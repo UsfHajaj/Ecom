@@ -19,12 +19,14 @@ namespace Ecom.infrastructure.Repositries.Services
         private readonly IUnitOfWork _work;
         private readonly AppDbContext _context;
         private readonly IMapper _mapper;
+        private readonly IPaymentService _paymentService;
 
-        public OrderService(IUnitOfWork work,AppDbContext context,IMapper mapper)
+        public OrderService(IUnitOfWork work,AppDbContext context,IMapper mapper,IPaymentService paymentService)
         {
             _work = work;
             _context = context;
             _mapper = mapper;
+            _paymentService = paymentService;
         }
 
         public async Task<Orders> CreateOrdersAsync(OrderDTO orderDTO, string BuyerEmail)
@@ -47,7 +49,17 @@ namespace Ecom.infrastructure.Repositries.Services
             var subTotal = orderItems.Sum(m => m.Price * m.Quntity);
 
             var shiping = _mapper.Map<ShippingAddress>( orderDTO.shipAddress);
-            var order = new Orders(BuyerEmail, subTotal, shiping, deliveryMethod, orderItems);
+
+            var existOrder=await _context.Orders.Where(m=>m.PaymentIntentId==basket.PaymentIntentID).FirstOrDefaultAsync();
+
+            if (existOrder is not null)
+            {
+                _context.Orders.Remove(existOrder);
+
+                await _paymentService.CreateOrderUpdatePaymentAsync(basket.PaymentIntentID,deliveryMethod.Id);
+            }
+
+            var order = new Orders(BuyerEmail, subTotal, shiping, deliveryMethod, orderItems,basket.PaymentIntentID);
 
             await _context.Orders.AddAsync(order);
             await _context.SaveChangesAsync();

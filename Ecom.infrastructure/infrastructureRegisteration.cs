@@ -29,6 +29,7 @@ namespace Ecom.infrastructure
         public static IServiceCollection infrastructureConfiguration(this IServiceCollection services,IConfiguration configuration)
         {
             services.AddScoped(typeof(IGenericRepositry<>), typeof(GenericRepositry<>));
+
             services.AddSingleton<IImageMangementService, ImageMangementService>();
             services.AddSingleton<IFileProvider>(
            new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot")));
@@ -36,6 +37,9 @@ namespace Ecom.infrastructure
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<IGenerateToken, GenerateToken>();
+
+            services.AddScoped<IPaymentService, PaymentService>();
+
             services.AddScoped<IOrderService,OrderService>();
             services.AddSingleton<IConnectionMultiplexer>(i =>
             {
