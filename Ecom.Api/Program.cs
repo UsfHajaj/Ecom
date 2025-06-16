@@ -31,6 +31,7 @@ namespace Ecom.Api
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
             builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+            builder.WebHost.UseUrls("http://0.0.0.0:5000");
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -39,6 +40,7 @@ namespace Ecom.Api
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
+            builder.WebHost.UseUrls("http://0.0.0.0:5000"); 
             app.UseRouting();
             app.UseCors("CORSPolicy");
             app.UseMiddleware<ExceptionsMiddleware>();

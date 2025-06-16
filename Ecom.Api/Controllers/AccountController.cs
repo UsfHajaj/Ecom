@@ -47,7 +47,11 @@ namespace Ecom.Api.Controllers
                 Domain = "localhost",
                 Expires = DateTime.Now.AddDays(1)
             });
-            return Ok(new ResponseAPI(200,result));
+            return Ok(new
+            {
+                token = result,
+                expiration = DateTime.UtcNow.AddDays(1),
+            });
         }
         [HttpPost("active-account")]
         public async Task<IActionResult> ActiveAccount(ActiveAccountDTO activeAccountDTO)
@@ -101,6 +105,22 @@ namespace Ecom.Api.Controllers
             var result=mapper.Map<ShipAddressDTO>(address);
 
             return Ok(result);
+        }
+
+        [HttpPost("logout")]
+        public IActionResult Logout()
+        {
+            Response.Cookies.Append("token", "", new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.None,
+                IsEssential = true,
+                Domain = "localhost",
+                Expires = DateTime.Now.AddDays(-1)
+            });
+
+            return Ok(new { message = "Logged out successfully" });
         }
     }
 }
