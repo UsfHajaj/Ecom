@@ -32,6 +32,7 @@ namespace Ecom.Api
             builder.Services.AddSwaggerGen();
             builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             builder.WebHost.UseUrls("http://0.0.0.0:5000");
+            builder.Configuration.AddEnvironmentVariables();
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
